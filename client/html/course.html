@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Details</title>
+  <!-- Include Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+  integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+  crossorigin="anonymous"></script>
+</head>
+<style>
+  body {
+  background: url("https://wallpaperaccess.com/full/1267583.jpg") no-repeat center center fixed;
+  background-size: 100% 100%;
+  height: 100%;
+  position: absolute;
+  width: 100%;
+}
+</style>
+<body>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col">
+        <h1>Course Details</h1>
+        <div class="card mt-3">
+          <div class="card-body">
+            <h5 class="card-title" id="courseName">Course Name: </h5>
+            <div id="lecturers">
+              <!-- Lecturer information will be added here dynamically -->
+            </div>
+            <p class="card-text" id="price">Price: </p>
+            <p class="card-text" id="rating">Rating: Not rated yet</p>
+            <div>Download : <a style="height: 10px;" id="course_file"></a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include Bootstrap JS (optional, for certain components) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Include your custom JavaScript -->
+  <script >
+
+const currentUrl = window.location.href;
+
+// Split the URL path using '/' as the separator
+const pathSegments = currentUrl.split('/');
+
+// Find the index of "course" in the path
+const courseIndex = pathSegments.indexOf('view');
+
+// Check if the "course" keyword is present and get the CourseID
+if (courseIndex !== -1 && courseIndex < pathSegments.length - 1) 
+   var courseId = pathSegments[courseIndex + 1];
+fetch(`../data/${courseId}`)
+  .then(response => response.json())
+  .then(data => {
+    document.getElementById('courseName').textContent += data.courseDetails.courseName;
+    document.getElementById('price').textContent += '$' + data.courseDetails.price;
+    document.getElementById('rating').textContent = 'Rating: ' + (data.courseDetails.rating.point > 0 ? data.courseDetails.rating.point : 'Not rated yet');
+    document.getElementById('course_file').href = `../download_course/${courseId}`
+    document.getElementById('course_file').textContent = data.courseDetails.courseName
+    const lecturersContainer = document.getElementById('lecturers');
+    data.courseDetails.lecturer.forEach(lecturer => {
+      const lecturerInfo = document.createElement('div');
+      lecturerInfo.className = 'card-text';
+      lecturerInfo.innerHTML = `
+        <p>Lecturer: ${lecturer.userName}</p>
+        <p>Email: ${lecturer.email}</p>
+      `;
+      lecturersContainer.appendChild(lecturerInfo);
+    });
+  })
+  </script>
+</body>
+</html>
