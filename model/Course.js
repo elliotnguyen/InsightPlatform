@@ -1,22 +1,38 @@
 const mongoose = require("mongoose");
 const User = require("./User");
+const Community = require("./Community")
 
 const CourseSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
     courseName: String,
-    lecturer: {
-        type: [mongoose.Types.ObjectId],
+    content: {
+        type: Buffer,
+    },
+    uploader: {
+        type: mongoose.Types.ObjectId,
         ref: "User",
         validate: {
             validator: async function(value) {
-                for (const id of value) {
-                    if (!await User.isLecturer(id)) {
-                        return false;
-                    }
+                if (!await User.isExistingUser(value)) {
+                    return false;
                 }
                 return true;
             }
         }
+    },
+    community: {
+        type: mongoose.Types.ObjectId,
+        validate: {
+            validator: async function(value) {
+                if (!await Community.isExistingCommunity) {
+                    return false;
+                }
+                return true;
+            }
+        }
+    },
+    description: {
+        type: String,
     },
     price: {
         type: Number,
@@ -33,10 +49,5 @@ const CourseSchema = new mongoose.Schema({
         }
     }    
 });
-
-CourseSchema.statics.isExistingCourse = async function(id) {
-    const course = await this.findOne({ _id: id });
-    return (course !== null);
-}
 
 module.exports = mongoose.model("Course", CourseSchema);

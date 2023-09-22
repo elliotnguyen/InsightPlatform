@@ -1,22 +1,12 @@
 const mongoose = require("mongoose");
 const Question = require("../model/Question");
 const DifficultyEnum = require("../constants/Enum");
+const { parseQuery } = require("./utils");
 
 const QuestionController = {
     addQuestion: async (req, res, next) => {
-
-        // input format:
-        // {
-        //     courseId: String,
-        //     question: String,
-        //     options: [String],
-        //     answer: String,
-        //     difficulty: Number
-        // }
-
         if (
-            !req.body.courseId ||
-            !req.body.question ||
+            !req.body.content ||
             !req.body.options ||
             !req.body.answer ||
             !req.body.difficulty
@@ -28,16 +18,12 @@ const QuestionController = {
             return;
         }
 
-        console.log(typeof DifficultyEnum);
-
         const newQuestion = new Question({
             _id: new mongoose.Types.ObjectId,
-            courseId: req.body.courseId,
-            content: {
-                question: req.body.question,
-                options: req.body.options,
-                answer: req.body.answer
-            },
+            content: req.body.content,
+            options: req.body.options,
+            answer: req.body.answer,
+            createdFrom: req.body.createdFrom,
             difficulty: req.body.difficulty
         });
 
@@ -58,61 +44,35 @@ const QuestionController = {
         });
     },
 
-    getQuestionsByDifficulty: async (req, res, next) => {
-        if (!req.body.courseId || !req.body.difficulty) {
-            next({
-                invalidFields: true,
-                message: "Missing difficulty."
-            });
-            return;
-        }
+    // getQuestionsByDifficulty: async (req, res, next) => {
+    //     const query = await parseQuery(req.query);
 
-        try {
-            const questions = await Question.find({
-                courseId: req.body.courseId,
-                difficulty: req.body.difficulty
-            }).select("courseId content.question content.options difficulty");
-            res.status(200).json({
-                success: true,
-                questions: questions
-            });
-        } catch (err) {
-            next({
-                success: false,
-                message: `No questions available at difficulty ${req.body.difficulty}`
-            });
-            return;
-        }
-    },
-    async getRandomQuestions(courseID, numQuestions) {
-        try {
-            // Get the total count of questions
-            const totalQuestions = await Question.countDocuments({ courseID });
+    //     if (!query.courseId || !query.difficulty) {
+    //         next({
+    //             invalidFields: true,
+    //             message: "Missing difficulty."
+    //         });
+    //         return;
+    //     }
 
-            // Generate an array of random indexes
-            const randomIndexes = [];
-            while (randomIndexes.length < numQuestions) {
-                const randomIndex = Math.floor(Math.random() * totalQuestions);
-                if (!randomIndexes.includes(randomIndex)) {
-                    randomIndexes.push(randomIndex);
-                }
-            }
+    //     try {
+    //         const questions = await Question.find({
+    //             courseId: query.courseId,
+    //             difficulty: query.difficulty
+    //         }).select("courseId content.question content.options difficulty");
+    //         res.status(200).json({
+    //             success: true,
+    //             questions: questions
+    //         });
+    //     } catch (err) {
+    //         next({
+    //             success: false,
+    //             message: `No questions available at difficulty ${req.body.difficulty}`
+    //         });
+    //         return;
+    //     }
+    // },
 
-            // Fetch questions using the random indexes
-            const randomQuestions = await Question.find({ courseID })
-                .skip(randomIndexes)
-                .limit(numQuestions);
-
-            let formattedRes = randomQuestions.map(e => {
-                e.content.answer = e.content.answer.at(0)
-                return e.content
-            });
-            console.log(formattedRes)
-            return formattedRes;
-        } catch (error) {
-            throw error;
-        }
-    },
     verifyAnswer: async (req, res, next) => {
         if (!req.body.answer || !req.body.id) {
             next({
@@ -123,10 +83,10 @@ const QuestionController = {
         }
 
         try {
-            const correctAnswer = await Question.findOne({ _id: req.body.id }).select("content.answer -_id");
+            const correctAnswer = await Question.findOne({_id: req.body.id}).select("answer -_id");
             res.send({
                 success: true,
-                verification: correctAnswer.content.answer === req.body.answer
+                verification: correctAnswer.answer === req.body.answer
             });
         } catch (err) {
             next({
