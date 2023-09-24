@@ -54,29 +54,6 @@ class ContractController {
         // metadataJson={}
         // .get("abcccccccccc",metadataJson)
     }
-    async get_data_for_game(req, res, next) {
-
-
-        // const functionName = 'ownsNFTForCourse'; // Replace with the name of the function you want to call
-        // const functionArguments = [req.user.address, req.params.courseID]; // Replace with the arguments for the function
-
-        // let isAllowedToLearn = await Transaction.runReadingFunction(functionName, functionArguments)
-        // isAllowedToLearn = JSON.parse(JSON.stringify(isAllowedToLearn, (key, value) =>
-        //     typeof value === "bigint" ? value.toString() : value
-        // ));
-        // if (!isAllowedToLearn) {
-        //     res.json({
-        //         message: 'Not permission to learn this course',
-        //         res: result,
-        //         success: false
-        //     })
-        //     return
-        // }
-
-        console.log(req.params)
-        let questions = await QuestionController.getRandomQuestions(req.params.courseID, 1)
-        res.json(questions)
-    }
 
     async buyCourse(req, res, next) {
 

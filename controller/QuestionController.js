@@ -4,9 +4,38 @@ const DifficultyEnum = require("../constants/Enum");
 const { parseQuery } = require("./utils");
 
 const QuestionController = {
+    getQuestionsByDifficulty: async (req, res, next) => {
+        const query = await parseQuery(req.query);
+
+        if (!query.courseId || !query.difficulty) {
+            next({
+                invalidFields: true,
+                message: "Missing difficulty."
+            });
+            return;
+        }
+
+        try {
+            const questions = await Question.find({
+                courseId: query.courseId,
+                difficulty: query.difficulty
+            }).select("courseId content.question content.options difficulty");
+            res.status(200).json({
+                success: true,
+                questions: questions
+            });
+        } catch (err) {
+            next({
+                success: false,
+                message: `No questions available at difficulty ${req.body.difficulty}`
+            });
+            return;
+        }
+    },
+
     addQuestion: async (req, res, next) => {
         if (
-            !req.body.content ||
+            !req.body.question ||
             !req.body.options ||
             !req.body.answer ||
             !req.body.difficulty
@@ -20,7 +49,7 @@ const QuestionController = {
 
         const newQuestion = new Question({
             _id: new mongoose.Types.ObjectId,
-            content: req.body.content,
+            question: req.body.question,
             options: req.body.options,
             answer: req.body.answer,
             createdFrom: req.body.createdFrom,
@@ -44,34 +73,45 @@ const QuestionController = {
         });
     },
 
-    // getQuestionsByDifficulty: async (req, res, next) => {
-    //     const query = await parseQuery(req.query);
+    addQuestionList: async(req, res, next) => {
+        if (!req.body.list) {
+            next({
+                invalidFields: true,
+                message: "Missing fields."
+            });
+            return;
+        }
 
-    //     if (!query.courseId || !query.difficulty) {
-    //         next({
-    //             invalidFields: true,
-    //             message: "Missing difficulty."
-    //         });
-    //         return;
-    //     }
+        const failed = [];
+        for (const q of req.body.list) {
+            const newQuestion = new Question({
+                _id: new mongoose.Types.ObjectId,
+                question: q.question,
+                options: q.options,
+                answer: q.answer,
+                createdFrom: q.createdFrom,
+                difficulty: q.difficulty
+            });
 
-    //     try {
-    //         const questions = await Question.find({
-    //             courseId: query.courseId,
-    //             difficulty: query.difficulty
-    //         }).select("courseId content.question content.options difficulty");
-    //         res.status(200).json({
-    //             success: true,
-    //             questions: questions
-    //         });
-    //     } catch (err) {
-    //         next({
-    //             success: false,
-    //             message: `No questions available at difficulty ${req.body.difficulty}`
-    //         });
-    //         return;
-    //     }
-    // },
+            try {
+                await newQuestion.save();
+            } catch (err) {
+                failed.push(newQuestion);
+            }
+        }
+
+        if (failed.length > 0) {
+            res.send({
+                success: false,
+                failOn: failed
+            });
+        } else {
+            res.send({
+                success: true,
+                message: "successfully"
+            });
+        }
+    },
 
     verifyAnswer: async (req, res, next) => {
         if (!req.body.answer || !req.body.id) {

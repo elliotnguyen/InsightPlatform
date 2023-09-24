@@ -18,6 +18,7 @@ const CourseController = {
         const newCourse = new Course({
             _id: new mongoose.Types.ObjectId,
             courseName: req.body.courseName,
+            content: req.file.buffer,
             uploader: req.body.uploader,
             description: req.body.description,
             price: req.body.price
@@ -38,6 +39,12 @@ const CourseController = {
             message: "successfully",
             course: newCourse
         });
+
+        //for read file
+
+        
+        // res.set('Content-Type', 'application/pdf');
+        // res.send(newCourse.content);  
     },
 
     getDetails: async (req, res, next) => {
@@ -58,28 +65,27 @@ const CourseController = {
             });
             return;
         }
-    }
-    // async download(req, res, next){
-    //     if(!ContractController.ownsNFTForCourse(req.user.address,req.params.courseID)) {
-    //         next({err:'not own this course'})
-    //         return;
-    //     }
-    //     let course = await Course.findOne({_id:req.params.courseID})
-    //     const pdfPath = path.join(__dirname, `../File/${req.params.courseID}.pdf`);
-    //     res.download(pdfPath, `${course.courseName}.pdf`);
+    },
+    async download(req, res, next){
+        if(!ContractController.ownsNFTForCourse(req.user.address,req.params.courseID)) {
+            next({err:'not own this course'})
+            return;
+        }
+        let course = await Course.findOne({_id:req.params.courseID})
+        const pdfPath = path.join(__dirname, `../File/${req.params.courseID}.pdf`);
+        res.download(pdfPath, `${course.courseName}.pdf`);
         
-    // },
-    // async viewCoursePage(req, res, next){
-    //     let isValid = await ContractController.ownsNFTForCourse(req.user.address,req.params.courseID)
-    //     console.log(isValid)
-    //     if(!isValid) {
-    //         next('not own this course')
-    //         return;
-    //     }
-    //     console.log('here')
-    //     res.sendFile(path.resolve(__dirname, '../client/html', 'course.html'));
-
-    // },
+    },
+    async viewCoursePage(req, res, next){
+        // let isValid = await ContractController.ownsNFTForCourse(req.user.address,req.params.courseID)
+        // console.log(isValid)
+        // if(!isValid) {
+        //     next('not own this course')
+        //     return;
+        // }
+        // console.log('here')
+        // res.sendFile(path.resolve(__dirname, '../client/html', 'course.html'));
+    },
     // async earnCertPage(req,res,next){
     //     res.sendFile(path.resolve(__dirname, '../client/html', 'game.html'));
     // }
