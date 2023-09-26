@@ -74,7 +74,6 @@ const CourseController = {
         let course = await Course.findOne({_id:req.params.courseID})
         const pdfPath = path.join(__dirname, `../File/${req.params.courseID}.pdf`);
         res.download(pdfPath, `${course.courseName}.pdf`);
-        
     },
     async viewCoursePage(req, res, next){
         // let isValid = await ContractController.ownsNFTForCourse(req.user.address,req.params.courseID)

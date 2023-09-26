@@ -21,6 +21,10 @@ const UserSchema = new mongoose.Schema({
     metamaskId: {
         type: String,
         required: true
+    },
+    point: {
+        type: Number,
+        default: 0
     }
 });
 
