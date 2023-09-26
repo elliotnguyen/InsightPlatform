@@ -30,6 +30,11 @@ app.use("/metadata",MetadataRouter);
 app.get('/home', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client/html', 'home.html'));
 });
+
+app.get('/exam', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client/html', 'exam.html'));
+});
+
 app.get('/upload-entranceDocument', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client/html', 'upload-entranceDocument.html'));
 });
