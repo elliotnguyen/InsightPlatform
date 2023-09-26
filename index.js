@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 const APIRouter = require('./router')
 const MetadataRouter = require('./router/MetadataRouter')
 const CourseRouter = require('./router/CourseRouter')
+const RequestMentorRouter = require('./router/RequestMentorRouter')
 const app = express();
 const path = require('path');
 const CourseController = require("./controller/CourseController");
@@ -34,6 +35,8 @@ app.get('/upload-entranceDocument', (req, res) => {
 });
 
 app.use('/course',CourseRouter)
+
+app.use('/request-mentor',RequestMentorRouter)
 
 
 app.use((err, req, res, next) => {
