@@ -3,7 +3,7 @@ const Question = require("../model/Question");
 const CourseController = require("./CourseController");
 const NFTController = require("./NFTController");
 const QuestionController = require("./QuestionController");
-
+const USER_ADDRESS_FAKER = "0x301d50321d084e9457ec42E6723694EdA6A6eC55"
 class ContractController {
     async getTotalCourses(req, res, next) {
         const totalCourses = await Transaction.runReadingFunction('getTotalCourses', []);
@@ -23,6 +23,7 @@ class ContractController {
             price: req.body.price, // Example price in wei (1 ether)
         };
 
+        
         var result = await Transaction.runWritingFunction("addCourse", [course])
         console.log(result)
         if (!result) return;
@@ -182,100 +183,6 @@ class ContractController {
     }
 
 
-
-    // CertNFT
-    async mintCert(req, res, next) {
-
-        const functionName = 'ownsNFTForCourse'; // Replace with the name of the function you want to call
-        const functionArguments = [req.user.address, req.params.courseID]; // Replace with the arguments for the function
-
-        let isAllowedToLearn = await Transaction.runReadingFunction(functionName, functionArguments)
-        isAllowedToLearn = JSON.parse(JSON.stringify(isAllowedToLearn, (key, value) =>
-            typeof value === "bigint" ? value.toString() : value
-        ));
-        if (!isAllowedToLearn) {
-            res.json({
-                message: 'Not permission to learn this course',
-                res: result,
-                success: false
-            })
-            return
-        }
-        var result
-        try {
-            const functionNameForMintCert = 'mintCertNFT'; // Replace with the name of the function you want to call
-            const functionArgumentsForMintCert = [req.user.address, req.params.courseID]; // Replace with the arguments for the function
-            result = await TransactionForCert.runWritingFunction(functionNameForMintCert, functionArgumentsForMintCert)
-            result = JSON.parse(JSON.stringify(result, (key, value) =>
-                typeof value === "bigint" ? value.toString() : value
-            ));
-        }
-        catch (err) {
-            console.log(err)
-            result = false
-        }
-
-        const functionNameForrewardItem = 'rewardItem'; // Replace with the name of the function you want to call
-        const functionArgumentsForrewardItem = [req.user.address]; // Replace with the arguments for the function
-        var isRewarded
-        try {
-            isRewarded = await Transaction.runWritingFunction(functionNameForrewardItem, functionArgumentsForrewardItem)
-            isRewarded = JSON.parse(JSON.stringify(isRewarded, (key, value) =>
-                typeof value === "bigint" ? value.toString() : value
-            ));
-        }
-        catch (err) {
-            isRewarded = err
-        }
-        // let eventDataForMint =  TransactionForCert.getEventDataFromTransactionHash(result.transactionHash)
-        // console.log(eventDataForMint)
-        const inputs = [
-            { type: "string", name: "courseID" },
-            { type: "address", name: "owner", indexed: true },
-            { type: "uint256", name: "tokenID" },
-        ];
-        if (result)
-            result = await Transaction.getEventDataFromTransactionHash(result.transactionHash, "NFTMinted(string,address,uint256)", inputs)
-
-        const inputsReward = [
-            { type: "address", name: "to" },
-            { type: "string", name: "courseId", indexed: true },
-            { type: "uint256", name: "tokenId" },
-        ];
-        if (isRewarded)
-            isRewarded = await Transaction.getEventDataFromTransactionHash(isRewarded.transactionHash, "RewardItem(address,string,uint256)", inputsReward)
-                ;
-
-        // let eventDataForRw =  Transaction.getEventDataFromTransactionHash(isRewarded.transactionHash)
-        // console.log(eventDataForRw)
-        NFTController.addNFT(req.params.courseID, `ccnft/${result.tokenID}`)
-        res.send({
-            message: '....',
-            certMinted: result,
-            success: true,
-            reward: isRewarded,
-        })
-
-
-    }
-
-
-    async ownsCertNFTForCourse(req, res, next) {
-
-
-        const functionName = 'ownsCertNFTForCourse'; // Replace with the name of the function you want to call
-        const functionArguments = ['0x2d89266fCf02dD5ac8387fBcb3A786eFcE0F48E9', 125]; // Replace with the arguments for the function
-
-        let result = await TransactionForCert.runReadingFunction(functionName, functionArguments)
-        result = JSON.parse(JSON.stringify(result, (key, value) =>
-            typeof value === "bigint" ? value.toString() : value
-        ));
-        res.json({
-            message: '....',
-            res: result,
-            success: true
-        })
-    }
     async getURITokenforCertNFT(req, res, next) {
         const functionName = 'tokenURI'; // Replace with the name of the function you want to call
         const functionArguments = [0]; // Replace with the arguments for the function
@@ -293,7 +200,7 @@ class ContractController {
     async setURIToken(req, res, next) {
         //check auth
         const functionName = 'ownsNFTForCourse'; // Replace with the name of the function you want to call
-        const functionArguments = [req.user.address, req.body.courseID]; // Replace with the arguments for the function
+        const functionArguments = [USER_ADDRESS_FAKER, req.body.courseID]; // Replace with the arguments for the function
 
         let isAllowed = await Transaction.runReadingFunction(functionName, functionArguments)
         isAllowed = JSON.parse(JSON.stringify(isAllowed, (key, value) =>

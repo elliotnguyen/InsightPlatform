@@ -54,14 +54,14 @@ const Transaction = {
       const txResponse = await signer.sendTransaction(tx);
       console.log('Transaction sent:', txResponse);
       return {
-        res:txResponse,
-        success:true
+        res: txResponse,
+        success: true
       }
     } catch (error) {
       console.error('Error:', error);
       return {
-        res:error,
-        success:false
+        res: error,
+        success: false
       }
     }
   }
@@ -69,11 +69,17 @@ const Transaction = {
 
 
 function toggleForm(formId) {
+
+
   const forms = ["buyCourseForm", "fundContractForm", "withdrawContractForm",
-    "openCourseForm", "earnCertificateForm", "viewDetailForm", "getTokenURIForm", "setMinterForm", "mintBatchForm", "getBoughtCourse"];
+    "openCourseForm", "viewDetailForm", "getTokenURIForm", "setMinterForm", "mintBatchForm", "getBoughtCourse", "addCourseForm"];
+
   forms.forEach(form => {
+    console.log(form)
+    console.log(document.getElementById(form))
     document.getElementById(form).style.display = "none";
   });
+  console.log(formId)
   document.getElementById(formId).style.display = "block";
 }
 
@@ -134,7 +140,7 @@ async function fundContract() {
     console.log(result)
     if (result.success) showMessage(amount + "has been funded")
 
-         else showMessage(result.res.data.message)
+    else showMessage(result.res.data.message)
 
   } catch (err) {
     console.log(err)
@@ -153,9 +159,9 @@ async function setMinter() {
   try {
     let result = await Transaction.sendTransaction(functionName, functionArguments)
     console.log(result)
-    if(result.success)
-    showMessage("Minter has set")
-    
+    if (result.success)
+      showMessage("Minter has set")
+
     else showMessage(result.res.data.message)
   } catch (err) {
     console.log(err)
@@ -190,8 +196,8 @@ async function mintBatch() {
     let result = await Transaction.sendTransaction(functionName, functionArguments)
     console.log(result)
 
-    if(result.success)
-    showMessage(numberOfNFT + "  has been minted")
+    if (result.success)
+      showMessage(numberOfNFT + "  has been minted")
     else showMessage(result.res.data.message)
   } catch (err) {
     console.log(err)
@@ -211,10 +217,10 @@ async function withdrawContract() {
     console.log(result)
     if (result.success)
       showMessage(amount + " has been withdrawed")
-         else showMessage(result.res.data.message)
+    else showMessage(result.res.data.message)
 
   } catch (err) {
-    console.log("heee",err)
+    console.log("heee", err)
     showMessage(amount + " has been not withdrawed")
 
   }
@@ -244,13 +250,38 @@ function viewCourseDetails() {
 
 function getTokenURI() {
   const tokenID = document.getElementById('tokenID').value;
-  const openingCourseNFT = document.getElementById('openingCourseNFT').checked;
-  const certificateNFT = document.getElementById('certificateNFT').checked;
-  let prefix = openingCourseNFT ? 'conft' : 'ccnft'
+  let prefix =  'conft' 
   showMessage(`<a href='./metadata/${prefix}/${tokenID}'>TOKEN URI </a>`)
+  console.log('Get Token URI:', tokenID, 'Opening Course NFT');
+  closeModal();
+}
+
+async function AddCourse() {
+  var form = document.getElementById('form_add_course');
+  var formData = new FormData(form);
+
+ let resultFromCourse = await fetch('/api/course/addcourse', {
+    method: 'POST',
+    body: formData
+  }).then(response => response.json())
+  const course = {
+    courseID: resultFromCourse.course._id,
+    price: resultFromCourse.course.price, // Example price in wei (1 ether)
+  };
+  console.log(course)
+  const functionName = 'addCourse'; // Replace with the name of the function you want to call
+  const functionArguments = [course]; // Replace with the arguments for the function
+  let result = await Transaction.sendTransaction(functionName, functionArguments)
+  if (!result.success) {
+    console.log('invalid transaction')
+    return;
+  }
+  showMessage(`Course's inserted with id: ${resultFromCourse.course._id}`)
   console.log('Get Token URI:', tokenID, 'Opening Course NFT:', openingCourseNFT, 'Certificate NFT:', certificateNFT);
   closeModal();
 }
+
+
 
 function closeModal() {
   // hideMessage()

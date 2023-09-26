@@ -23,6 +23,6 @@ router.get('/withdraw_contract',contractController.withDrawContract)
 router.get('/get_tokenURI',contractController.getURIToken)
 // router.get('/get_questions/:courseID',contractController.get_data_for_game)
 router.post('/set_uri',contractController.setURIToken)
-// router.post('/transaction_hash',contractController.getEventData)
+router.post('/transaction_hash',contractController.getEventData)
 
 module.exports = router

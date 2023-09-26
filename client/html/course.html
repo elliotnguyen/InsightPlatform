@@ -59,21 +59,31 @@ if (courseIndex !== -1 && courseIndex < pathSegments.length - 1)
 fetch(`../data/${courseId}`)
   .then(response => response.json())
   .then(data => {
+    console.log(data)
     document.getElementById('courseName').textContent += data.courseDetails.courseName;
     document.getElementById('price').textContent += '$' + data.courseDetails.price;
     document.getElementById('rating').textContent = 'Rating: ' + (data.courseDetails.rating.point > 0 ? data.courseDetails.rating.point : 'Not rated yet');
-    document.getElementById('course_file').href = `../download_course/${courseId}`
-    document.getElementById('course_file').textContent = data.courseDetails.courseName
     const lecturersContainer = document.getElementById('lecturers');
-    data.courseDetails.lecturer.forEach(lecturer => {
       const lecturerInfo = document.createElement('div');
       lecturerInfo.className = 'card-text';
       lecturerInfo.innerHTML = `
-        <p>Lecturer: ${lecturer.userName}</p>
-        <p>Email: ${lecturer.email}</p>
+        <p>Lecturer: ${data.courseDetails.uploader.name}</p>
+        <p>Metamask Id: ${data.courseDetails.uploader.metamaskId}</p>
       `;
       lecturersContainer.appendChild(lecturerInfo);
-    });
+    // Create a Blob from the Buffer data
+    const bufferData = new Uint8Array(data.courseDetails.content.data);
+      const blob = new Blob([bufferData], { type: 'application/pdf' });
+
+      // Create a data URL from the Blob
+      const blobUrl = URL.createObjectURL(blob);
+
+      // Create a download link for the user to download the PDF
+      const downloadLink = document.createElement('a');
+      downloadLink.href = blobUrl;
+      downloadLink.textContent = 'Course.pdf';
+      downloadLink.download = 'course.pdf'; // Set the filename here
+      document.getElementById('course_file').appendChild(downloadLink);
   })
   </script>
 </body>

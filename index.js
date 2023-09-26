@@ -24,14 +24,10 @@ app.use(morgan('combined'));
 app.use(cors());  //avoid "cors" error
 
 app.use("/api",APIRouter);
-// app.use("/metadata",MetadataRouter);
+app.use("/metadata",MetadataRouter);
 
 app.get('/home', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client/html', 'home.html'));
-});
-
-app.get('/upload-course', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client/html', 'upload-course.html'));
 });
 app.get('/upload-entranceDocument', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client/html', 'upload-entranceDocument.html'));

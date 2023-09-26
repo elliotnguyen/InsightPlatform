@@ -6,29 +6,23 @@ const User = require("../model/User");
 const NFTController = {
     addNFT: async (courseID,uri) => {
         
-        const courseDetails = await Course.findOne({_id: courseID}).exec();
+        const courseDetails = await Course.findOne({_id: courseID}).populate('uploader', '_id name metamaskId');;
         if (!courseDetails){
             return({
                 error:'Course does not exist'
             })
         }
-        const lecturerId = courseDetails.lecturer;
-        const lecturer = []
-        for (id of lecturerId) {
-            lecturer.push(await User.findOne({_id: id}).select("userName"));
-        }
-
         const newNFT = new NFT({
             _id: new mongoose.Types.ObjectId,
             uri: uri,
             metadata: {
-                name: "Name NFT",
-                description: "Description",
+                name: "CourseOpening NFT",
+                description: courseDetails.description,
                 image: "[image url]",
                 externalUrl: "[website to learn more about the NFT]",
                 attributes: [
                     {traitType: "course", value: {id: courseID, courseName: courseDetails.courseName}},
-                    {traitType: "lecturer", value: lecturer}
+                    {traitType: "uploader", value: courseDetails.uploader.name}
                 ]
             }
         });
