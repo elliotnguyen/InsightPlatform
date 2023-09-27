@@ -17,9 +17,9 @@ const QuestionController = {
 
         try {
             const questions = await Question.find({
-                courseId: query.courseId,
+                //courseId: query.courseId,
                 difficulty: query.difficulty
-            }).select("courseId content.question content.options difficulty");
+            }).select("courseId question options difficulty");
             res.status(200).json({
                 success: true,
                 questions: questions
@@ -114,7 +114,8 @@ const QuestionController = {
     },
 
     verifyAnswer: async (req, res, next) => {
-        if (!req.body.answer || !req.body.id) {
+        const query = await parseQuery(req.query);
+        if (!query.answer || !query.id) {
             next({
                 invalidFields: true,
                 message: "Missing fields."
@@ -123,10 +124,10 @@ const QuestionController = {
         }
 
         try {
-            const correctAnswer = await Question.findOne({_id: req.body.id}).select("answer -_id");
+            const correctAnswer = await Question.findOne({_id: query.id}).select("answer -_id");
             res.send({
                 success: true,
-                verification: correctAnswer.answer === req.body.answer
+                verification: correctAnswer.answer === query.answer
             });
         } catch (err) {
             next({
