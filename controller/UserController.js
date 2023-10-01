@@ -30,7 +30,8 @@ const UserController = {
             password: req.body.password,
             createdDate: new Date(),
             yearOfBirth: req.body.yearOfBirth,
-            metamaskId: req.body.metamaskId
+            metamaskId: req.body.metamaskId,
+            point: req.body.point
         });
         
         try {

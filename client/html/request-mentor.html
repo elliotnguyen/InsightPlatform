@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Info Search</title>
+  <!-- Bootstrap CSS link -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <style>
+    /* Add custom CSS */
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 50vh;
+        margin: 0;
+        background: url("https://wallpaperaccess.com/full/3648396.jpg") no-repeat center center fixed;
+        background-size: 100% 100%;
+    }
+    .userListItem {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 10px;
+      }
+    .userDetails {
+        margin-bottom: 10px;
+    }
+    .buttonDiv {
+        display: flex;
+        justify-content: flex-start;
+    }
+    .searchContainer {
+        text-align: center;
+    }
+    .list-group-item {
+        background-color: #f9f9f9;
+        padding: 20px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 searchContainer" >
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" id="userIdInput" placeholder="Enter Mentor ID">
+          <div class="input-group-append">
+            <button class="btn btn-primary" type="button" onclick="searchMentorInfo()">Search</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ul id="userList" class="list-group"></ul>
+  </div>
+
+  <!-- Bootstrap JS and Popper.js scripts -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="../js/requestMentor.js"></script>
+</body>
+</html>

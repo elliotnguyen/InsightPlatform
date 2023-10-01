@@ -39,6 +39,10 @@ app.get('/upload-entranceDocument', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client/html', 'upload-entranceDocument.html'));
 });
 
+app.get('/request-mentor', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client/html', 'request-mentor.html'));
+});
+
 app.use('/course',CourseRouter)
 
 app.use('/request-mentor',RequestMentorRouter)
