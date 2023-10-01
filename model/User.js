@@ -16,7 +16,8 @@ const UserSchema = new mongoose.Schema({
         default: Date.now,
     },
     yearOfBirth: {
-        type: Date
+        type: Date,
+        default: Date.now
     },
     metamaskId: {
         type: String,

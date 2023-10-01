@@ -43,6 +43,10 @@ app.get('/request-mentor', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client/html', 'request-mentor.html'));
 });
 
+app.get('/notification', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client/html', 'notification.html'));
+});
+
 app.use('/course',CourseRouter)
 
 app.use('/request-mentor',RequestMentorRouter)
